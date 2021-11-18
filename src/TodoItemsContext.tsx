@@ -11,6 +11,7 @@ export interface TodoItem {
   title: string;
   details?: string;
   done: boolean;
+  isEdit: boolean;
   tags?: Array<string>;
 }
 
@@ -19,7 +20,7 @@ interface TodoItemsState {
 }
 
 interface TodoItemsAction {
-  type: "loadState" | "add" | "delete" | "toggleDone";
+  type: "loadState" | "add" | "delete" | "toggleDone" | "edit";
   data: any;
 }
 
@@ -76,7 +77,6 @@ function todoItemsReducer(state: TodoItemsState, action: TodoItemsAction) {
       return action.data;
     }
     case "add":
-      console.log(action.data.todoItem);
       return {
         ...state,
         todoItems: [
@@ -88,6 +88,22 @@ function todoItemsReducer(state: TodoItemsState, action: TodoItemsAction) {
       return {
         ...state,
         todoItems: state.todoItems.filter(({ id }) => id !== action.data.id),
+      };
+    case "edit":
+      return {
+        ...state,
+        todoItems: state.todoItems.map((item) => {
+          if (item.id !== action.data.id) {
+            return item;
+          }
+
+          return {
+            ...item,
+            title: action.data.editTitle,
+            details: action.data.editDesc,
+            tags: action.data.editTags,
+          };
+        }),
       };
     case "toggleDone":
       const itemIndex = state.todoItems.findIndex(

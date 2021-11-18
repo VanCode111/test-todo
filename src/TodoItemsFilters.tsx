@@ -24,7 +24,6 @@ const TodoItemsFilters = ({
           setFilterTags((prev) => prev.filter((item: string) => item !== e))
         }
         onAdd={(e) => setFilterTags((prev) => [...prev, e])}
-        //className={classes.root}
       />
     </>
   );
