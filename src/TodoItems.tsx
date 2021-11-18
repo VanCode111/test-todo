@@ -29,12 +29,30 @@ const useTodoItemListStyles = makeStyles({
   },
 });
 
-export const TodoItemsList = function () {
+export const TodoItemsList = function ({
+  filterTags,
+}: {
+  filterTags: Array<string>;
+}) {
   const { todoItems } = useTodoItems();
 
   const classes = useTodoItemListStyles();
 
-  const sortedItems = todoItems.slice().sort((a, b) => {
+  let filterItems = todoItems;
+
+  if (filterTags) {
+    filterItems = todoItems.filter((item, index) => {
+      let tags = true;
+      filterTags.forEach((tag) => {
+        if (!item.tags?.includes(tag)) {
+          tags = false;
+        }
+      });
+      return tags;
+    });
+  }
+
+  const sortedItems = filterItems.slice().sort((a, b) => {
     if (a.done && !b.done) {
       return 1;
     }
