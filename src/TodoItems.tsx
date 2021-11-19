@@ -39,7 +39,6 @@ export const TodoItemsList = function ({
   filterTags: Array<string>;
 }) {
   const { todoItems } = useTodoItems();
-
   const classes = useTodoItemListStyles();
 
   let filterItems = todoItems;
@@ -129,7 +128,12 @@ export const TodoItemCard = function ({ item }: { item: TodoItem }) {
     if (isEdit) {
       dispatch({
         type: "edit",
-        data: { id: item.id, editTitle, editDesc, editTags },
+        data: {
+          id: item.id,
+          title: editTitle,
+          details: editDesc,
+          tags: editTags,
+        },
       });
     } else {
       setEditTags(item.tags || []);

@@ -2,6 +2,7 @@ import { useTodoItems } from "./TodoItemsContext";
 import { useForm, Controller } from "react-hook-form";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+import { ITodoItem } from "./TodoItemsContext";
 import { makeStyles } from "@material-ui/core/styles";
 import ChipInput from "material-ui-chip-input";
 
@@ -18,8 +19,8 @@ export default function TodoItemForm() {
 
   return (
     <form
-      onSubmit={handleSubmit((formData) => {
-        dispatch({ type: "add", data: { todoItem: formData } });
+      onSubmit={handleSubmit((formData: ITodoItem) => {
+        dispatch({ type: "add", data: formData });
         reset({ title: "", details: "", tags: [] });
       })}
     >

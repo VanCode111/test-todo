@@ -11,7 +11,12 @@ export interface TodoItem {
   title: string;
   details?: string;
   done: boolean;
-  isEdit: boolean;
+  tags?: Array<string>;
+}
+
+export interface ITodoItem {
+  title: string;
+  details?: string;
   tags?: Array<string>;
 }
 
@@ -19,10 +24,41 @@ interface TodoItemsState {
   todoItems: TodoItem[];
 }
 
-interface TodoItemsAction {
-  type: "loadState" | "add" | "delete" | "toggleDone" | "edit";
-  data: any;
+interface ActionLoadState {
+  type: "loadState";
+  data: TodoItem[];
 }
+
+interface ActionAdd {
+  type: "add";
+  data: ITodoItem;
+}
+
+interface ActionDeletes {
+  type: "delete";
+  data: { id: string };
+}
+
+interface ActionToggleDone {
+  type: "toggleDone";
+  data: { id: string };
+}
+
+export interface ITodoItemEdit extends ITodoItem {
+  id: string;
+}
+
+interface ActionEdit {
+  type: "edit";
+  data: ITodoItemEdit;
+}
+
+type TodoItemsAction =
+  | ActionAdd
+  | ActionLoadState
+  | ActionDeletes
+  | ActionToggleDone
+  | ActionEdit;
 
 const TodoItemsContext = createContext<
   (TodoItemsState & { dispatch: (action: TodoItemsAction) => void }) | null
@@ -36,14 +72,19 @@ export const TodoItemsContextProvider = ({
 }: {
   children?: ReactNode;
 }) => {
-  const [state, dispatch] = useReducer(todoItemsReducer, defaultState);
+  const [state, dispatch] = useReducer<
+    React.Reducer<TodoItemsState, TodoItemsAction>
+  >(todoItemsReducer, defaultState);
 
   useEffect(() => {
     const savedState = localStorage.getItem(localStorageKey);
 
     if (savedState) {
       try {
-        dispatch({ type: "loadState", data: JSON.parse(savedState) });
+        dispatch({
+          type: "loadState",
+          data: [...JSON.parse(savedState).todoItems],
+        });
       } catch {}
     }
   }, []);
@@ -71,16 +112,19 @@ export const useTodoItems = () => {
   return todoItemsContext;
 };
 
-function todoItemsReducer(state: TodoItemsState, action: TodoItemsAction) {
+function todoItemsReducer(
+  state: TodoItemsState,
+  action: TodoItemsAction
+): TodoItemsState {
   switch (action.type) {
     case "loadState": {
-      return action.data;
+      return { todoItems: action.data };
     }
     case "add":
       return {
         ...state,
         todoItems: [
-          { id: generateId(), done: false, ...action.data.todoItem },
+          { id: generateId(), done: false, ...action.data },
           ...state.todoItems,
         ],
       };
@@ -99,9 +143,7 @@ function todoItemsReducer(state: TodoItemsState, action: TodoItemsAction) {
 
           return {
             ...item,
-            title: action.data.editTitle,
-            details: action.data.editDesc,
-            tags: action.data.editTags,
+            ...action.data,
           };
         }),
       };
