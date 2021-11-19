@@ -206,7 +206,7 @@ export const TodoItemCard = function ({ item }: { item: TodoItem }) {
           )
         }
       />
-      {item.details ? (
+      {item.details || isEdit ? (
         <CardContent>
           {isEdit ? (
             <TextField
